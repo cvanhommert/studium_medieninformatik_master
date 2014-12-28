@@ -1,0 +1,5 @@
+11:06:38:947: Deleting directory: build
+11:06:38:999: Creating output directory: build
+11:06:39:004: Compiling files from: src to: build
+11:06:40:030: Running: AgeGuessingGame
+11:27:48:638: Successfully finished running: AgeGuessingGame

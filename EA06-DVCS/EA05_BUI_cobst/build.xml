@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<project name="AgeGuessingGame" basedir="." default="execute">
+	
+	<!-- Set properties for the targets -->
+	<property name="src" value="src"/><!-- Source directory -->
+	<property name="build" value="build"/><!-- Build directory --> 
+	<property name="lib" value="lib"/><!-- Directory for external libraries -->
+	<property name="reports" value="log"/><!-- Directory for reports -->
+	<property name="classname" value="AgeGuessingGame" /><!-- Specific classname of this project -->
+	<property name="time.stamp.pattern" value="yyyy-MM-dd_HH:mm:ss" /><!-- Specifiy timestamp pattern for filenames etc. -->
+	<property name="time.stamp.mills.pattern" value="HH:mm:ss:SSS"/><!-- Specify timestamp pattern with milliseconds for logging/debugging -->
+	
+	<!-- Save the actual Timestamp for logging -->
+	<tstamp>
+		<format property="time.stamp" pattern="${time.stamp.pattern}"/>
+	</tstamp>
+	
+	<property name="logfile" value="${reports}/${time.stamp}.log"/><!-- Specify the name of the current logfile -->
+	
+	<!-- Set classpath for this program and needed libraries -->
+	<path id="java">
+		<pathelement location="${build}"/>
+		<fileset dir="${lib}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+
+
+	<!-- Test if report directory is available -->
+	<target name="test1">
+		<available file="${reports}" property="${reports}.present"/>
+		<fail message="Reports path '${reports}' not present!"
+			unless="${reports}.present"/>
+	</target>
+	
+	
+	
+	<!-- Test if source directory is available -->
+	<target name="test2">
+		<available file="${src}" property="${src}.present"/>
+		<fail message="Source path '${src}' not present!"
+			unless="${src}.present"/>
+	</target>
+
+
+
+	<!-- Test if source file is available -->	
+	<target name="test3">
+		<available file="${classname}.java" filepath="${src}" property="${classname}.present"/>
+		<fail message="File '${src}/${classname}.java' not present!"
+			unless="${classname}.present"/>
+	</target>
+	
+	<!-- Just a test compilation. Extend dependencies for further tests. -->
+	<target name="tests" depends="test1,test2,test3"/>
+	
+
+
+	<!-- Clean old builds, if tests ran correctly -->
+	<target name="clean" depends="tests">
+
+		<!-- Create a new log file for this run -->
+		<touch file="${logfile}" datetime="${time.stamp}" pattern="${time.stamp.pattern}"/>
+		
+		<!-- Protocol of current milliseconds in log output for debugging purposes -->
+		<tstamp>
+			<format property="clean.stamp" pattern="${time.stamp.mills.pattern}"/>
+		</tstamp>
+		<property name="cleanOut" value="Deleting directory: ${build}"/>
+		<echo file="${logfile}" append="true" message="${clean.stamp}: ${cleanOut}${line.separator}"/>
+		
+		<delete dir="${build}"/>
+		
+	</target>
+
+
+
+	<!-- create the build path if clean ran correctly -->
+	<target name="create" depends="clean">
+		
+		<!-- Protocol of current milliseconds in log output for debugging purposes -->
+		<tstamp>
+			<format property="create.stamp" pattern="${time.stamp.mills.pattern}"/>
+		</tstamp>
+		<property name="createOut" value="Creating output directory: ${build}"/>
+		<echo file="${logfile}" append="true" message="${create.stamp}: ${createOut}${line.separator}"/>
+		
+		<mkdir dir="${build}"/>
+		
+	</target>
+
+
+
+	<!-- compile source files if create ran correctly -->
+	<target name="compile" depends="create">
+		
+		<!-- Protocol of current milliseconds in log output for debugging purposes -->
+		<tstamp>
+			<format property="compile.stamp" pattern="${time.stamp.mills.pattern}"/>
+		</tstamp>
+		<property name="compileOut" value="Compiling files from: ${src} to: ${build}"/>
+		<echo file="${logfile}" append="true" message="${compile.stamp}: ${compileOut}${line.separator}"/>
+		
+		<javac destdir="${build}" includeantruntime="false">
+			<src path="${src}"/>
+			<classpath refid="java"/>
+		</javac>
+		
+	</target>
+	
+	
+	
+	<!-- run the program if compile ran correctly -->
+	<target name="run" depends="compile">
+		
+		<!-- Protocol of current milliseconds in log output for debugging purposes -->
+		<tstamp>
+			<format property="run.stamp" pattern="${time.stamp.mills.pattern}"/>
+		</tstamp>
+		<property name="runOut" value="Running: ${classname}"/>
+		<echo file="${logfile}" append="true" message="${run.stamp}: ${runOut}${line.separator}"/>
+		
+		<java classname="AgeGuessingGame">
+			<classpath refid="java"/>
+		</java>
+	</target>
+	
+	
+	
+	<!-- Report when run done -->
+	<target name="report" depends="run">
+		
+		<!-- Protocol of current milliseconds in log output for debugging purposes -->
+		<tstamp>
+			<format property="report.stamp" pattern="${time.stamp.mills.pattern}"/>
+		</tstamp>
+		<property name="reportOut" value="Successfully finished running: ${classname}"/>
+		<echo file="${logfile}" append="true" message="${report.stamp}: ${reportOut}${line.separator}"/>
+		
+	</target>
+
+</project>
